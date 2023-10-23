@@ -9,9 +9,10 @@ namespace ToriApp.Server.Services
         private readonly DataContext _dataContext;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public ProductService(DataContext dataContext)
+        public ProductService(DataContext dataContext, IHttpContextAccessor httpContextAccessor)
         {
             _dataContext = dataContext;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<ServiceResponse<Product>> CreateProduct(Product product)
@@ -59,8 +60,9 @@ namespace ToriApp.Server.Services
             var response = new ServiceResponse<List<Product>>
             {
                 Data = await _dataContext.Products
-                .Where(p => p.Featured)
-                .Include(p => p.Variants)
+                .Where(p => p.Featured && p.Visible && !p.Deleted)
+                .Include(p => p.Variants.Where(v => v.Visible && !v.Deleted))
+                .Include(p => p.Images)
                 .ToListAsync()
             };
             
@@ -71,7 +73,10 @@ namespace ToriApp.Server.Services
         {
             var response = new ServiceResponse<List<Product>>
             {
-                Data = await _dataContext.Products.Include(p => p.Variants).ToListAsync()
+                Data = await _dataContext.Products
+                .Where(p => p.Visible && !p.Deleted)
+                .Include(p => p.Variants.Where(v => v.Visible && !v.Deleted))
+                .ToListAsync()
             };
 
             return response;
@@ -84,11 +89,20 @@ namespace ToriApp.Server.Services
 
             if (_httpContextAccessor.HttpContext.User.IsInRole("Admin"))
             {
-                product = await _dataContext.Products.Include(p => p.Variants.Where(v => !v.Deleted)).ThenInclude(v => v.ProductType).Include(p => p.Images).FirstOrDefaultAsync(p => p.Id == productId && !p.Deleted && p.Visible);
+                product = await _dataContext.Products
+                    .Include(p => p.Variants
+                    .Where(v => !v.Deleted))
+                    .ThenInclude(v => v.ProductType)
+                    .Include(p => p.Images)
+                    .FirstOrDefaultAsync(p => p.Id == productId && !p.Deleted);
             }
             else
             {
-                product = await _dataContext.Products.Include(p => p.Variants.Where(v => !v.Deleted)).ThenInclude(v => v.ProductType).Include(p => p.Images).FirstOrDefaultAsync(p => p.Id == productId && !p.Deleted && p.Visible);
+                product = await _dataContext.Products
+                    .Include(p => p.Variants.Where(v => v.Visible && !v.Deleted))
+                    .ThenInclude(v => v.ProductType)
+                    .Include(p => p.Images)
+                    .FirstOrDefaultAsync(p => p.Id == productId && !p.Deleted && p.Visible);
             }
 
             if (product != null)
@@ -108,7 +122,11 @@ namespace ToriApp.Server.Services
         {
             var response = new ServiceResponse<List<Product>> 
             {
-                Data = await _dataContext.Products.Where(p => p.Category.Url.ToLower().Equals(categoryUrl.ToLower())).Include(p => p.Variants).ToListAsync()
+                Data = await _dataContext.Products
+                    .Where(p => p.Category.Url.ToLower().Equals(categoryUrl.ToLower()) && p.Visible && !p.Deleted)
+                    .Include(p => p.Variants.Where(v => v.Visible && !v.Deleted))
+                    .Include(p => p.Images)
+                    .ToListAsync()
             };
 
             return response;
@@ -149,11 +167,13 @@ namespace ToriApp.Server.Services
             var pageResults = 2f;
             var pageCount = Math.Ceiling((await FindProductsBySearchText(searchText)).Count / pageResults);
             var products = await _dataContext.Products
-                .Where(p => p.Title.ToLower().Contains(searchText.ToLower()) || p.Description.ToLower().Contains(searchText.ToLower()))
+                .Where(p => p.Title.ToLower().Contains(searchText.ToLower()) || p.Description.ToLower().Contains(searchText.ToLower()) && p.Visible && !p.Deleted)
                 .Include(p => p.Variants)
+                .Include(p => p.Images)
                 .Skip((page -1) * (int)pageResults)
                 .Take((int)pageResults)
                 .ToListAsync();
+
             var response = new ServiceResponse<ProductSearchResult>
             {
                 Data = new ProductSearchResult
@@ -169,7 +189,9 @@ namespace ToriApp.Server.Services
 
         public async Task<ServiceResponse<Product>> UpdateProduct(Product product)
         {
-            var dbProduct = await _dataContext.Products.Include(p => p.Images).FirstOrDefaultAsync(p => p.Id == product.Id);
+            var dbProduct = await _dataContext.Products
+                .Include(p => p.Images)
+                .FirstOrDefaultAsync(p => p.Id == product.Id);
 
             if (dbProduct == null)
             {
@@ -214,7 +236,8 @@ namespace ToriApp.Server.Services
         private async Task<List<Product>> FindProductsBySearchText(string searchText)
         {
             return await _dataContext.Products
-                .Where(p => p.Title.ToLower().Contains(searchText.ToLower()) || p.Description.ToLower().Contains(searchText.ToLower()) && p.Visible && !p.Deleted)
+                .Where(p => p.Title.ToLower().Contains(searchText.ToLower()) ||
+                p.Description.ToLower().Contains(searchText.ToLower()) && p.Visible && !p.Deleted)
                 .Include(p => p.Variants)
                 .ToListAsync();
         }
