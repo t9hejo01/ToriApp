@@ -1,0 +1,71 @@
+﻿@inject IAddressService AddressService
+
+@if (address == null)
+{
+    <span>
+        Address does not exist.
+        <button class="btn" @onclick="InitAddress">Add an address</button>
+    </span>
+}
+else if (!editAddress) 
+{
+    <p>
+        <span>@address.FirstName @address.LastName</span><br />
+        <span>@address.Street</span><br />
+        <span>@address.PostalCode</span><br />
+        <span>@address.City</span><br />
+    </p>
+    <button class="btn btn-primary" @onclick="EditAddress">Edit</button>
+}
+else
+{
+    <EditForm Model="address" OnSubmit="SubmitAddress">
+        <div class="mb-3">
+            <label for="firstname">First Name</label>
+            <InputText id="firstname" @bind-Value="address.FirstName" class="form-control" />
+        </div>
+        <div class="mb-3">
+            <label for="lastname">Last Name</label>
+            <InputText id="lastname" @bind-Value="address.LastName" class="form-control" />
+        </div>
+        <div class="mb-3">
+            <label for="street">Street</label>
+            <InputText id="street" @bind-Value="address.Street" class="form-control" />
+        </div>
+        <div class="mb-3">
+            <label for="postalcode">Postal Code</label>
+            <InputText id="postalcode" @bind-Value="address.PostalCode" class="form-control" />
+        </div>
+        <div class="mb-3">
+            <label for="city">City</label>
+            <InputText id="city" @bind-Value="address.City" class="form-control" />
+        </div>
+    </EditForm>
+}
+
+@code {
+    Address address = null;
+    bool editAddress = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        address = await AddressService.GetAddress();
+    }
+
+    private async Task SubmitAddress()
+    {
+        editAddress = false;
+        address = await AddressService.AddOrUpdateAddress(address);
+    }
+
+    private void InitAddress()
+    {
+        address = new Address();
+        editAddress = true;
+    }
+
+    private void EditAddress()
+    {
+        editAddress = true;
+    }
+}
