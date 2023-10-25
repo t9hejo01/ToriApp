@@ -13,5 +13,7 @@ namespace ToriApp.Shared
         public Byte[] PasswordHash { get; set; }
         public Byte[] PasswordSalt { get; set; }
         public DateTime DateCreated { get; set; } = DateTime.Now;
+        public Address Address { get; set; }
+        public string Role { get; set; } = "Customer";
     }
 }

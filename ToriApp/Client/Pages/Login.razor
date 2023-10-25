@@ -14,12 +14,12 @@
     <DataAnnotationsValidator />
     <div class="mb-3">
         <label for="email">Email</label>
-        <InputText id="email" @bind-value="user.Email" class="form-control" />
+        <InputText id="email" @bind-Value="user.Email" class="form-control" />
         <ValidationMessage For="@(() => user.Email)" />
     </div>
     <div class="mb-3">
         <label for="password">Password</label>
-        <InputText id="password" @bind-value="user.Password" class="form-control" type="password"/>
+        <InputText id="password" @bind-Value="user.Password" class="form-control" type="password"/>
         <ValidationMessage For="@(() => user.Password)" />
     </div>
     <button type="submit" class="btn btn-primary">Login</button>
