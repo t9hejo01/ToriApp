@@ -1,5 +1,4 @@
 ﻿@page "/admin/categories"
-@using Microsoft.AspNetCore.Authorization;
 @inject ICategoryService CategoryService
 @attribute [Authorize(Roles = "Admin")]
 @implements IDisposable

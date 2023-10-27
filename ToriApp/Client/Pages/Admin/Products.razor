@@ -1,5 +1,4 @@
 ﻿@page "/admin/products"
-@using Microsoft.AspNetCore.Authorization;
 @inject IProductService ProductService
 @inject NavigationManager NavigationManager
 @attribute [Authorize(Roles = "Admin")]

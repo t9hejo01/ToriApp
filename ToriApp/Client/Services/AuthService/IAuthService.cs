@@ -1,6 +1,4 @@
-﻿using ToriApp.Shared;
-
-namespace ToriApp.Client.Services.AuthService
+﻿namespace ToriApp.Client.Services.AuthService
 {
     public interface IAuthService
     {

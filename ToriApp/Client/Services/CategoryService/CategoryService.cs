@@ -1,6 +1,4 @@
-﻿using ToriApp.Client.Pages.Admin;
-
-namespace ToriApp.Client.Services.CategoryService
+﻿namespace ToriApp.Client.Services.CategoryService
 {
     public class CategoryService : ICategoryService
     {

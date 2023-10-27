@@ -1,7 +1,4 @@
-﻿using System.Net.Http.Json;
-using ToriApp.Shared;
-
-namespace ToriApp.Client.Services.AuthService
+﻿namespace ToriApp.Client.Services.AuthService
 {
     public class AuthService : IAuthService
     {
