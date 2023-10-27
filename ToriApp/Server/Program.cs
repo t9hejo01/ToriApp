@@ -1,11 +1,13 @@
 global using ToriApp.Shared;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.IdentityModel.Tokens;
 using ToriApp.Server.Data;
 using ToriApp.Server.Interfaces;
 using ToriApp.Server.Services;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,18 +29,17 @@ builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IProductTypeService, ProductTypeService>();
 builder.Services.AddScoped<IAddressService, AddressService>();
 
-builder.Services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
 {
-    options.TokenValidationParameters = new TokenValidationParameters()
+    options.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateIssuerSigningKey = true,
-        IssuerSigningKey = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(builder.Configuration.GetSection("AppSettings:Token").Value)),
+        IssuerSigningKey = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(builder.Configuration.GetSection("AppSettings:authToken").Value)),
         ValidateIssuer = false,
         ValidateAudience = false
     };
 });
+builder.Services.AddHttpContextAccessor();
 
 var app = builder.Build();
 
