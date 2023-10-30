@@ -54,8 +54,8 @@ namespace ToriApp.Server.Services
                 },
                 LineItems = lineItems,
                 Mode = "payment",
-                SuccessUrl = "https://localhost:7226/order-success",
-                CancelUrl = "https://localhost:7226/cart"
+                SuccessUrl = "https://localhost:5281/order-success",
+                CancelUrl = "https://localhost:5281/cart"
             };
 
             var service = new SessionService();
