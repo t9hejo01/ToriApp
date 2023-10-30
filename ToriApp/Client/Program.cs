@@ -8,8 +8,6 @@ global using ToriApp.Client.Services.CartService;
 global using ToriApp.Client.Services.ProductTypeService;
 global using ToriApp.Client.Services.AddressService;
 global using ToriApp.Client.Services.OrderService;
-global using ToriApp.Client.Services.AuthService;
-global using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using ToriApp.Client;
