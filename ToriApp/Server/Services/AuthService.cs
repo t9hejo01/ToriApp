@@ -128,7 +128,7 @@ namespace ToriApp.Server.Services
             };
 
             var key = new SymmetricSecurityKey(
-                System.Text.Encoding.UTF8.GetBytes(_configuration.GetSection("AppSettings:Token").Value));
+                System.Text.Encoding.UTF8.GetBytes(_configuration.GetSection("AppSettings:authToken").Value));
 
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
 
