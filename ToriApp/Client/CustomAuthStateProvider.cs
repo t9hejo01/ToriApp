@@ -46,7 +46,7 @@ namespace ToriApp.Client
             return state;
         }
 
-        private IEnumerable<Claim>? ParseClaimsFromJwt(string jwt)
+        private IEnumerable<Claim> ParseClaimsFromJwt(string jwt)
         {
             var payload = jwt.Split('.')[1];
             var jsonBytes = ParseBase64WithoutPadding(payload);
