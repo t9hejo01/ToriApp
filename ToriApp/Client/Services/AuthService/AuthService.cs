@@ -18,10 +18,7 @@
             return await result.Content.ReadFromJsonAsync<ServiceResponse<bool>>();
         }
 
-        public async Task<bool> IsUserAuthenticated()
-        {
-            return (await _stateProvider.GetAuthenticationStateAsync()).User.Identity.IsAuthenticated;
-        }
+        public async Task<bool> IsUserAuthenticated() => (await _stateProvider.GetAuthenticationStateAsync()).User.Identity.IsAuthenticated;
 
         public async Task<ServiceResponse<string>> Login(UserLogin request)
         {
