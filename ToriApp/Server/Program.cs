@@ -4,15 +4,16 @@ using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.IdentityModel.Tokens;
+using Stripe;
 using ToriApp.Server.Data;
 using ToriApp.Server.Interfaces;
 using ToriApp.Server.Services;
-
+using ProductService = ToriApp.Server.Services.ProductService;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
+StripeConfiguration.ApiKey = "sk_test_rfaBmNUu1lWB7VZ0MMSIsYjH";
 builder.Services.AddDbContext<DataContext>();
 
 builder.Services.AddControllersWithViews();

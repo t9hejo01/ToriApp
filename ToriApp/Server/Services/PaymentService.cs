@@ -14,13 +14,10 @@ namespace ToriApp.Server.Services
 
         public PaymentService(ICartService cartService, IAuthService authService, IOrderService orderService)
         {
-            StripeConfiguration.ApiKey = "sk_test_rfaBmNUu1lWB7VZ0MMSIsYjH";
-
-            _authService = authService;
             _cartService = cartService;
+            _authService = authService;
             _orderService = orderService;
         }
-
         public async Task<Session> CreateCheckoutSession()
         {
             var products = (await _cartService.GetDbCartProducts()).Data;
@@ -37,7 +34,7 @@ namespace ToriApp.Server.Services
                         Images = new List<string> { product.ImageUrl }
                     }
                 },
-                Quantity = product.Quantity
+                Quantity = product.Quantity,
             }));
 
             var options = new SessionCreateOptions
@@ -45,9 +42,8 @@ namespace ToriApp.Server.Services
                 CustomerEmail = _authService.GetUserEmail(),
                 ShippingAddressCollection = new SessionShippingAddressCollectionOptions
                 {
-                    AllowedCountries = new List<string> { "USA" } 
+                    AllowedCountries = new List<string> { "US" }
                 },
-
                 PaymentMethodTypes = new List<string>
                 {
                     "card"
@@ -57,9 +53,9 @@ namespace ToriApp.Server.Services
                 SuccessUrl = "https://localhost:5281/order-success",
                 CancelUrl = "https://localhost:5281/cart"
             };
-
             var service = new SessionService();
             Session session = service.Create(options);
+
             return session;
         }
 
@@ -68,21 +64,22 @@ namespace ToriApp.Server.Services
             var json = await new StreamReader(request.Body).ReadToEndAsync();
             try
             {
-                var stripeEvent = EventUtility.ConstructEvent(json, request.Headers["Stripe-Signature"], secret);
+                var stripeEvent = EventUtility.ConstructEvent(json, request.Headers["Stripe.Signature"], secret);
+
                 if (stripeEvent.Type == Events.CheckoutSessionCompleted)
                 {
-                    var session = stripeEvent.Data.Object as Session;
+                    var session = stripeEvent.Data.Object as Stripe.Checkout.Session;
                     var user = await _authService.GetUserByEmail(session.CustomerEmail);
                     await _orderService.PlaceOrder(user.Id);
                 }
 
                 return new ServiceResponse<bool> { Data = true };
             }
-            catch (StripeException e)
+            catch (Exception ex)
             {
-                return new ServiceResponse<bool> { Data = false, Success = false, Message = e.Message };
+                return new ServiceResponse<bool> { Data = false, Success = false, Message = ex.Message };
 
             }
         }
-    }  
+    }
 }

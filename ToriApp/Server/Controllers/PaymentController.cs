@@ -11,9 +11,9 @@ namespace ToriApp.Server.Controllers
     {
         private readonly IPaymentService _paymentService;
 
-        public PaymentController(IPaymentService paymentService)
+        public PaymentController(IPaymentService payment)
         {
-            _paymentService = paymentService;
+            _paymentService = payment;
         }
 
         [HttpPost("checkout"), Authorize]
